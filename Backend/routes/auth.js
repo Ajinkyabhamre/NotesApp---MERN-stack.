@@ -62,7 +62,6 @@ router.post(
 );
 
 //ROUTE.2 : Authenticate  a User using POST: "/api/auth/login"
-
 router.post(
   "/login",
   [
@@ -108,7 +107,7 @@ router.post(
 );
 
 //ROUTE.3 : Get loggedin User Details using POST: "/api/auth/getUser". LOGIN REQUIRED
-router.post("/getUser", fetchuser, async (req, res) => {
+router.post("/getuser", fetchuser, async (req, res) => {
   try {
     userId = req.user.id;
     const user = await User.findById(userId).select("-password");
