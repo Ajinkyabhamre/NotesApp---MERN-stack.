@@ -60,4 +60,50 @@ router.post(
   }
 );
 
+//Authenticate  a User using POST: "/api/auth/login"
+
+router.post(
+  "/login",
+  [
+    body("email", "Enter a valid email...").isEmail(),
+    body("password", "password cannot be blank").exists(),
+  ],
+  async (req, res) => {
+    //If there are errors, return Bad requests and errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+    try {
+      //pulling email from database to authenticate
+      let user = await User.findOne({ email });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ errors: "Please try to login with correct credentials " });
+      }
+
+      const passwordCompare = await bcrypt.compare(password, user.password);
+      if (!passwordCompare) {
+        return res
+          .status(400)
+          .json({ errors: "Please try to login with correct credentials " });
+      }
+
+      const data = {
+        user: {
+          id: user.id,
+        },
+      };
+      const AuthToken = jwt.sign(data, JWT_SECRET);
+      res.json({ AuthToken });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).send("Some Error Ocuured !");
+    }
+  }
+);
+
 module.exports = router;
