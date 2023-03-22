@@ -49,7 +49,7 @@ export const Home = () => {
         </form>
       </div>
 
-<Notes/>
+    <Notes/>
     </div>
   );
 };
