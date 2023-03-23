@@ -5,7 +5,7 @@ import AddNotes from "./AddNotes";
 
 export const Notes = () => {
   const context = useContext(noteContext);
-  const { notes, getNotes } = context;
+  const { notes, getNotes, editNote } = context;
 
   useEffect(() => {
     //fetches all notes
@@ -13,21 +13,27 @@ export const Notes = () => {
     // eslint-disable-next-line
   }, []);
 
+  const [note, setnote] = useState({
+    id: "",
+    etitle: "",
+    edescription: "",
+    etag: "default",
+  });
+    const ref = useRef(null);
+    const refClose = useRef(null);
+
   const updateNote = (currentnote) => {
     ref.current.click();
-    setnote({etitle:currentnote.title, edescription:currentnote.description, etag:currentnote.tag})
+    setnote({id:currentnote._id, etitle:currentnote.title, edescription:currentnote.description, etag:currentnote.tag})
   };
-  const ref = useRef(null);
 
-    const [note, setnote] = useState({
-      etitle: "",
-      edescription: "",
-      etag: "default",
-    });
+
+
 
   const handleClick = (e) => {
-      console.log("updating the note..", note)
-      e.preventDefault();
+    console.log("updating the note..", note)
+    editNote(note.id, note.etitle,note.edescription, note.etag)
+       refClose.current.click();
     };
     const onChange = (e) => {
       setnote({ ...note, [e.target.name]: e.target.value });
@@ -109,6 +115,7 @@ export const Notes = () => {
             </div>
             <div className="modal-footer">
               <button
+                ref={refClose}
                 type="button"
                 className="btn btn-secondary"
                 data-bs-dismiss="modal"
