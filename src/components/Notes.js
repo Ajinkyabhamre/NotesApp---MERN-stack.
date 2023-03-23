@@ -3,7 +3,7 @@ import noteContext from "../context/notes/noteContext";
 import NoteItem from "./NoteItem";
 import AddNotes from "./AddNotes";
 
-export const Notes = () => {
+export const Notes = (props) => {
   const context = useContext(noteContext);
   const { notes, getNotes, editNote } = context;
 
@@ -19,25 +19,28 @@ export const Notes = () => {
     edescription: "",
     etag: "default",
   });
-    const ref = useRef(null);
-    const refClose = useRef(null);
+  const ref = useRef(null);
+  const refClose = useRef(null);
 
   const updateNote = (currentnote) => {
     ref.current.click();
-    setnote({id:currentnote._id, etitle:currentnote.title, edescription:currentnote.description, etag:currentnote.tag})
+    setnote({
+      id: currentnote._id,
+      etitle: currentnote.title,
+      edescription: currentnote.description,
+      etag: currentnote.tag,
+    });
   };
 
-
-
-
   const handleClick = (e) => {
-    console.log("updating the note..", note)
-    editNote(note.id, note.etitle,note.edescription, note.etag)
-       refClose.current.click();
-    };
-    const onChange = (e) => {
-      setnote({ ...note, [e.target.name]: e.target.value });
-    };
+    console.log("updating the note..", note);
+    editNote(note.id, note.etitle, note.edescription, note.etag);
+    props.showAlert("Updated Successfully", "success");
+    refClose.current.click();
+  };
+  const onChange = (e) => {
+    setnote({ ...note, [e.target.name]: e.target.value });
+  };
   return (
     <>
       <button
@@ -129,7 +132,9 @@ export const Notes = () => {
                 Close
               </button>
               <button
-                disabled={note.etitle.length < 5 || note.edescription.length < 5}
+                disabled={
+                  note.etitle.length < 5 || note.edescription.length < 5
+                }
                 onClick={handleClick}
                 type="button"
                 className="btn btn-primary"
@@ -141,7 +146,7 @@ export const Notes = () => {
         </div>
       </div>
 
-      <AddNotes />
+      <AddNotes showAlert={props.showAlert} />
       <div className="row my-3">
         <h2>Your Notes</h2>
         <div className="container mx-2">
@@ -149,7 +154,12 @@ export const Notes = () => {
         </div>
         {notes.map((note) => {
           return (
-            <NoteItem key={note._id} updateNote={updateNote} note={note} />
+            <NoteItem
+              key={note._id}
+              updateNote={updateNote}
+              note={note}
+              showAlert={props.showAlert}
+            />
           );
         })}
       </div>
