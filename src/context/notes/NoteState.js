@@ -4,14 +4,39 @@ import NoteContext from "./noteContext";
 //In this file we are creating states which we wanted down the tree in any component without pasing props again and again
 
 const NoteState = (props) => {
+  const host = "http://localhost:3000";
+  const [notes, setNotes] = useState([]);
 
+  //Get all notes
+  const getNotes = async () => {
+    //TODO: API CALL
+    const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQxOThjZDM4OTM2YTBjMjZmNDU2ZTA1In0sImlhdCI6MTY3OTM5NjA4M30.gvzaHI3zTe8nZnvvElkX11HGlNL0ASLQdrW3z682CBg",
+      },
+    });
+    const json = await response.json()
+    console.log(json);
+    setNotes(json)
 
-  const [notes, setNotes] = useState([])
+  };
 
   //Add a note
-  const addNote = (title, description, tag) => {
+  const addNote = async (title, description, tag) => {
     //TODO: API CALL
-    console.log("Adding a new note")
+    const response = await fetch(`${host}/api/notes/addnote`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQxOThjZDM4OTM2YTBjMjZmNDU2ZTA1In0sImlhdCI6MTY3OTM5NjA4M30.gvzaHI3zTe8nZnvvElkX11HGlNL0ASLQdrW3z682CBg",
+      },
+      body: JSON.stringify({ title, description, tag }),
+    });
+    console.log("Adding a new note");
     const note = {
       _id: "123213",
       user: "345656",
@@ -22,9 +47,8 @@ const NoteState = (props) => {
       __v: 0,
     };
     //concat return an array whereas push updates an array
-    setNotes(notes.concat(note))
-  
-}
+    setNotes(notes.concat(note));
+  };
   //Delete a note
   const deleteNote = (id) => {
     //TODO: API CALL
@@ -36,15 +60,36 @@ const NoteState = (props) => {
   };
 
   //Edit a note
-    const editNote = (id, title, description, tag) => {};
+  const editNote = async (id, title, description, tag) => {
+    //TODO: API CALL
+    const response = await fetch(`${host}/api/notes/updatenote/${id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "auth-token":
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjQxOThjZDM4OTM2YTBjMjZmNDU2ZTA1In0sImlhdCI6MTY3OTM5NjA4M30.gvzaHI3zTe8nZnvvElkX11HGlNL0ASLQdrW3z682CBg",
+      },
+      body: JSON.stringify({ title, description, tag }),
+    });
+    const json = response.json();
 
+    //Logic to edit on client
+    for (let index = 0; index < notes.length; index++) {
+      const element = notes[index];
+      if (element._id === id) {
+        element.title = title;
+        element.description = description;
+        element.tag = tag;
+      }
+    }
+  };
 
   return (
     //props.children are wrapped inside & value is passed as above state
     //{<-Javascript {<- object ->} ->}
 
     //instead of writing like this ->  {{state: state, update: update}}
-    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote }}>
+    <NoteContext.Provider value={{ notes, addNote, deleteNote, editNote , getNotes}}>
       {props.children}
     </NoteContext.Provider>
   );
