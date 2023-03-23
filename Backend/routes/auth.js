@@ -17,18 +17,22 @@ router.post(
     body("password", "Enter a valid password...").isLength({ min: 5 }),
   ],
   async (req, res) => {
+    let success = false;
     //If there are errors, return Bad requests and errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success, errors: errors.array() });
     }
     try {
       let user = await User.findOne({ email: req.body.email });
       //console.log(user);
       if (user) {
-        return res.status(400).json({
-          error: "Sorry a user wth this email id is already registered.",
-        });
+        return res
+          .status(400)
+          .json({
+            success,
+            error: "Sorry a user wth this email id is already registered.",
+          });
       }
       //using salt & bcript.js
       const salt = await bcrypt.genSalt(10);
@@ -50,8 +54,8 @@ router.post(
       console.log(AuthToken);
 
       //res.json(user);
-
-      res.json({ AuthToken });
+      success = true;
+      res.json({ success, AuthToken });
 
       //catch errors
     } catch (error) {
@@ -84,7 +88,10 @@ router.post(
         success = false;
         return res
           .status(400)
-          .json({success, errors: "Please try to login with correct credentials " });
+          .json({
+            success,
+            errors: "Please try to login with correct credentials ",
+          });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
@@ -92,7 +99,10 @@ router.post(
         success = false;
         return res
           .status(400)
-          .json({success, errors: "Please try to login with correct credentials " });
+          .json({
+            success,
+            errors: "Please try to login with correct credentials ",
+          });
       }
 
       const data = {
@@ -102,7 +112,7 @@ router.post(
       };
       const AuthToken = jwt.sign(data, JWT_SECRET);
       success = true;
-      res.json({success, AuthToken });
+      res.json({ success, AuthToken });
     } catch (error) {
       console.log(error.message);
       res.status(500).send("Some Error Ocuured !");
